@@ -1,0 +1,21 @@
+*{
+    margin: 0;
+    padding: 0;
+    border: none
+}
+
+.container{
+
+}
+
+
+
+canvas{
+    position: absolute;
+    /* box-sizing: border-box; */
+    /* border: 1px solid black; */
+}
+
+canvas:hover{
+    cursor: pointer;
+}
