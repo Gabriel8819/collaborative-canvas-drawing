@@ -1,3 +1,13 @@
+
+let menu = document.querySelector("div#menu");
+// let sizeSlider = document.querySelector("#size-slider");
+// let sizeNumber = document.querySelector("#size-number");
+
+let size = 100;
+// sizeNumber.value = size;
+
+
+
 let canvas = document.querySelector("canvas");
 let ctx= canvas.getContext("2d");
 
@@ -12,12 +22,9 @@ let isDrawing = false;
 
 resizeCanvas();
 
-
-
-
 //To delete
-ctx.fillStyle = "grey"
-ctx.fillRect(0, 0, canvas.width, canvas.height)
+// ctx.fillStyle = "grey"
+// ctx.fillRect(0, 0, canvas.width, canvas.height)
 //To delete
 
 
@@ -30,8 +37,8 @@ window.addEventListener("resize", (e)=>{
     canvasData = ctx.getImageData(0 , 0, canvas.width, canvas.height);
     resizeCanvas();
     //To delete
-    ctx.fillStyle = "grey";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // ctx.fillStyle = "grey";
+    // ctx.fillRect(0, 0, canvas.width, canvas.height);
     //to delete
     ctx.putImageData(canvasData, 0 , 0);
 })
@@ -39,9 +46,9 @@ window.addEventListener("resize", (e)=>{
 
 canvas.addEventListener("mousedown", canvasMouseDown)
 
-
 canvas.addEventListener("mouseup", canvasMouseUp)
 
+canvas.addEventListener("mousemove", canvasMouseDrag)  
 
 
 
@@ -54,7 +61,6 @@ function resizeCanvas(){
     }
 }
 
-canvas.addEventListener("mousemove", canvasMouseDrag)  
 
 function canvasMouseDown(e){
     ctx.beginPath();
@@ -69,7 +75,8 @@ function canvasMouseUp(e){
 }
 
 function canvasMouseDrag(e){
-    if(!isDrawing) return;
+    if(!isDrawing || size == 0) return;
+    console.log(size)
 
     let scrollX = window.scrollX;
     let scrollY = window.scrollY;
@@ -79,11 +86,42 @@ function canvasMouseDrag(e){
     ctx.fillStyle = "black";
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
-    ctx.lineWidth = 40;
+    ctx.lineWidth = size;
     ctx.lineTo(x, y);
     ctx.stroke();
-    
-    
 }
+
+
+
+
+
+
+//menu
+
+
+// sizeSlider.addEventListener("input", (e)=>{
+//     let value = e.target.valueAsNumber
+
+//     size = value;
+//     sizeNumber.value = value
+//     console.log(size)
+
+// })
+
+
+document.addEventListener("mousemove", (e)=>{
+    let x = e.clientX;
+    let y = e.clientY;
+
+    if(y < 80){
+        menu.style.top = "0px";
+    }else{
+        menu.style.top = "-40px";
+    }
+
+})
+
+
+
 
 
