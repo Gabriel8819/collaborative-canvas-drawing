@@ -11,6 +11,7 @@
 
 
 
+    
 
 
 </head>
@@ -27,16 +28,26 @@
 
 
     </div> -->
+    <div class="main-menu">
+        <h1>Menu</h1>
+        <div id="size-selector">
+            <!-- <span>size</span> -->
+            <!-- <span id="icon pen-icon"></span> -->
+            <input id="size-slider" type="range" min="0" max="800">
+            <input id="size-number" type="number">
+        </div>
+        <div id="menu-icons">
+            <span class="icon pen-icon" data-tool="pen"></span>
+            <span class="icon eraser-icon" data-tool="eraser"></span>
+            <span class="icon line-icon" data-tool="line"></span>
+            <span class="icon square-icon" data-tool="square"></span>
+            <span class="icon circle-icon" data-tool="circle"></span>
+            <span class="icon pen-tool-icon" data-tool="pen-tool"></span>
 
-    <div id="menu">
-        <button id="size" class="icon">
-            <span id="size-icon"></span>
-            <div id="size-selector">
-                <input type="range" min="0" max="800">
-            </div>
-        </button>
-
-
+        </div>
+    </div>
+    <div id="menu-button" data-is-open="false">
+        <div class="hamburger-menu"></div>
     </div>
 
 
@@ -48,6 +59,6 @@
 
 
 
-    <script src="index.js"></script>
+    <script type="module" src="index.js"></script>
 </body>
 </html>

@@ -11,8 +11,6 @@
 
 canvas{
     position: absolute;
-    /* box-sizing: border-box; */
-    /* border: 1px solid black; */
 }
 
 canvas:hover{
@@ -22,82 +20,191 @@ canvas:hover{
 
 
 /* Menu */
-
-div#menu{
-    width: 100%;
-    height: 40px;
-    display: flex;
+div#menu-button{
+    width: 50px;
+    height: 50px;
+    background-color: grey;
+    border-radius: 50%;
     position: absolute;
-    top: -40px;
-    left: 0;
-    z-index: 999;
-    background-color: white;
-    box-shadow: 0px 0px 10px 1px rgba(100,100,100,0.7);
-    border-radius: 0 10px 10px 0;
-    transition: top 0.5s;
+    right: 10px;
+    top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+
+
 }
 
-
-
-
-button.icon{
-    width: 40px;
-    height: 40px;
-}
-
-button.icon:hover{
+div#menu-button:hover{
     cursor: pointer;
 }
 
-span#size-icon{
+.hamburger-menu,
+.hamburger-menu::before,
+.hamburger-menu::after{
+    position: absolute;
+    background-color: white;
+    width: 30px;
+    height: 5px;
+    border-radius: 5px;
+   
+}
+.hamburger-menu::before,
+.hamburger-menu::after{
     display: block;
-    margin: 0 auto;
-    width: 32px;
-    height: 32px;
-    background-color: black;
+    content: "";
+}
+.hamburger-menu::before{
+    top: -10px;
+}
+.hamburger-menu::after{
+    top: 10px;
+}
+
+div.main-menu{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    padding: 20px;
+    background-color: rgb(182, 182, 182);
+    border-radius: 20px;
+    z-index: 100;
+    text-align: center;
+    display: none;
+}
+
+div.main-menu > h1{
+    margin-bottom: 20px;
+}
+
+
+
+
+
+/* Menu Icons */
+
+
+
+/* Size icon */
+
+div#size-selector{
+    height: 30px;
+    width: 100%;
+    display: flex;
+
+    
+}
+
+div.main-menu input[type=range]{
+    margin: 0 5px;
+    flex-grow: 2;
+}
+
+div.main-menu input[type=range]:hover{
+    cursor: pointer;
+}
+
+div.main-menu input[type=number]{
+    appearance: textfield;
+    width: 10%;
+    height: 30px;
+    text-align:center;
+    border-radius: 5px;
+}
+
+
+.pen-icon{
+    /* display: block; */
+    width: 30px;
+    height: 30px;
+    max-width: 30px;
+    max-height: 30px;
+    background-image: url("/assets/images/pen.png");
+    background-size: contain;
+}
+
+
+
+
+
+/* other icons */
+div#menu-icons{
+    display: flex;
+    margin: 10px 0;
+    flex-wrap: wrap;
+
+
+}
+
+
+.icon{
+    width: 30px;
+    height: 30px;
+
+}
+
+.icon:hover{
+    cursor: pointer;
+    background-color: rgb(119, 119, 119);
+    border-radius: 5px;
+}
+
+.pen-icon,
+.pen-tool-icon,
+.eraser-icon{
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 27px;
+}
+
+.eraser-icon{
+    background-image: url("/assets/images/eraser.png");
+}
+
+.square-icon,
+.circle-icon,
+.line-icon{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.square-icon::after,
+.circle-icon::after{
+    content: "";
+    display: block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgb(0, 0, 0);
+}
+
+.circle-icon::after{
     border-radius: 50%;
 }
 
-button#size{
-    position: relative;
-}
-
-button#size:hover div#size-selector{
+.line-icon::after{
+    content: "";
     display: block;
+    width: 30px;
+    height: 30px;
+    border-top: 2px solid rgb(0, 0, 0);
+    transform-origin: 0 0;
+    transform: rotate(45deg) translateX(8px);
 }
 
-div#size-selector{
-    position: absolute;
-    top: 40px;
-    left:0;
-    height: 40px;
-    display: none;
-
+.pen-tool-icon{
+    background-image: url("/assets/images/pen-tool.png");
 }
 
-
-
-
-div#size-selector input{
-    appearance: none;
-    background-color: grey;
-    /* padding: 10px 0; */
-    height: 40px
+.pen-icon{
+    background-image: url("/assets/images/pen.png");
 }
 
-div#size-selector input::-webkit-slider-runnable-track,
-div#size-selector input::-moz-range-track{
-   /* width: 40px;
-   height: 40px;
-   background-color: blue; */
-}
-
-div#size-selector input::-webkit-slider-thumb,
-div#size-selector input::-moz-range-thumb{
-   width: 40px;
-   height: 40px;
-   background-color: blue;
-   cursor: pointer
+.selected-icon{
+    background-color: rgb(119, 119, 119);
 }
 
 
@@ -105,54 +212,7 @@ div#size-selector input::-moz-range-thumb{
 
 
 
-
-/* Size Slider */
-#size{
-    display: flex;
-    height: 40px;
-    align-items: center;
-    /* justify-content: center; */
-
-}
-
-
-#size-slider{
-    appearance: none;
-    height: 20px;
-    background: grey;
-    margin: 10px 0 10px 10px;
-}
-
-
-#size-slider::-webkit-slider-thumb{
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    background: #04AA6D;
-    cursor: pointer;
-}
-
-#size-slider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    background: #04AA6D;
-    cursor: pointer;
-  }
-
-#size-number{
-    display: block;
-    padding: 0px 10px;
-    margin:0 10px;
-    width: 40px;
-    font-size: 20px;
-    border: 1px solid black
-}
-
-#size-number:focus{
-    outline: none;
-}
-
-label[for=size-number]{
+/* label[for=size-number]{
     display:block;
 }
 
@@ -171,6 +231,6 @@ label[for=size-number]{
 #eraser:hover{
     background-color: #eee;
     cursor: pointer;
-}
+} */
 
 
