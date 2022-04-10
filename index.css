@@ -25,7 +25,7 @@ div#menu-button{
     height: 50px;
     background-color: grey;
     border-radius: 50%;
-    position: absolute;
+    position: fixed;
     right: 10px;
     top: 10px;
     display: flex;
@@ -135,7 +135,7 @@ div#menu-icons{
     display: flex;
     margin: 10px 0;
     flex-wrap: wrap;
-
+    justify-content: space-between;
 
 }
 
@@ -202,6 +202,23 @@ div#menu-icons{
 .pen-icon{
     background-image: url("/assets/images/pen.png");
 }
+
+
+div.color-icon{
+    flex-grow: 1;
+    display: flex;
+}
+
+div.color-icon > label{
+    display: block;
+    line-height: 30px;
+    font-size: 1.1em;
+}
+
+input[type=color]{
+    height: 30px;
+}
+
 
 .selected-icon{
     background-color: rgb(119, 119, 119);
