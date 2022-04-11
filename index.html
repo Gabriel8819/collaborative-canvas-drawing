@@ -31,27 +31,51 @@
     <div class="main-menu">
         <h1>Menu</h1>
         <div id="size-selector">
-            <!-- <span>size</span> -->
-            <!-- <span id="icon pen-icon"></span> -->
-            <input id="size-slider" type="range" min="0" max="400">
-            <input id="size-number" type="number">
+            <h4>Tool Size</h4>
+            <div>
+                <input id="size-slider" type="range" min="0" max="400">
+                <input id="size-number" type="number">
+            </div>
         </div>
         <div id="menu-icons">
-            <span class="icon pen-icon" data-tool="pen"></span>
-            <span class="icon eraser-icon" data-tool="eraser"></span>
-            <span class="icon line-icon" data-tool="line"></span>
-            <span class="icon square-icon" data-tool="square"></span>
-            <span class="icon circle-icon" data-tool="circle"></span>
-            <span class="icon pen-tool-icon" data-tool="pen-tool"></span>
+            <h4>Tools</h4>
+            <div id="tool-icons">
+                <span class="icon pen-icon" data-tool="pen"></span>
+                <span class="icon eraser-icon" data-tool="eraser"></span>
+                <span class="icon line-icon" data-tool="line"></span>
+                <span class="icon square-icon" data-tool="square"></span>
+                <span class="icon circle-icon" data-tool="circle"></span>
+                <span class="icon pen-tool-icon" data-tool="pen-tool"></span>
+            </div>
         </div>
-        <div class="color-icon">
-            <label for="color">Color: </label>
-            <input id="color" type="color">
+        <div class="advanced-icons">
+            <div id="color-picker">
+                <input id="color" type="color">
+            </div>
+            <div id="blank-page">
+                <button id="blank-page-button">New Page <span id="blank-page-icon"></span></button>
+            </div>
+        </div>
+        <div id="storage-menu">
+            <h4>Save your drawing to:</h4>
+            <div id="storage-choice">
+                <div id="google-drive" class="big-icon">
+                    <button></button>
+                    <span>Google Drive</span>
+                </div>
+                <div id="hard-drive" class="big-icon">
+                    <button></button>
+                    <span>Hard Drive</span>
+                </div>
+            </div>
         </div>
     </div>
-    <div id="menu-button" data-is-open="false">
+
+    <label for="menu-button">
+        <input id="menu-button" type="checkbox">
         <div class="hamburger-menu"></div>
-    </div>
+    </label>
+    
 
 
 

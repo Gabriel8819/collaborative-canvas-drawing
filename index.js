@@ -2,13 +2,15 @@ import {isNumber, isBetween, getRatio} from "./utils/utils.js";
 
 
 
-let menuButton = document.querySelector("div#menu-button");
+let menuButton = document.querySelector("label[for=menu-button]");
 let mainMenu = document.querySelector("div.main-menu");
 let sizeSlider = document.querySelector("#size-slider");
 let sizeNumber = document.querySelector("#size-number");
 let sizeIcon = document.querySelector("span#size-icon");
 let icons = document.querySelectorAll(".icon")
 let colorInput = document.querySelector("input[type=color]")
+let blankPageButton = document.querySelector("#blank-page-button");
+let hardDriveButton = document.querySelector("#hard-drive")
 
 
 let tools = {
@@ -24,6 +26,7 @@ let currentTool = tools.PEN;
 let color = "#000";
 let backgroundColor = "#fff";
 let lastToolIndex = 0;
+let firstClick = false;
 let size = sizeNumber.value = sizeSlider.value = 10;
 
 let canvas = document.querySelector("canvas");
@@ -40,10 +43,10 @@ let isDrawing = false;
 
 resizeCanvas();
 
-//To delete
-// ctx.fillStyle = "grey"
-// ctx.fillRect(0, 0, canvas.width, canvas.height)
-//To delete
+
+ctx.fillStyle = "white"
+ctx.fillRect(0, 0, canvas.width, canvas.height)
+
 
 
 window.addEventListener("wheel", (e)=>{
@@ -54,21 +57,17 @@ window.addEventListener("wheel", (e)=>{
 window.addEventListener("resize", (e)=>{
     canvasData = ctx.getImageData(0 , 0, canvas.width, canvas.height);
     resizeCanvas();
-    //To delete
-    // ctx.fillStyle = "grey";
-    // ctx.fillRect(0, 0, canvas.width, canvas.height);
-    //to delete
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.putImageData(canvasData, 0 , 0);
 })
 
 
-// canvas.addEventListener("mousedown", canvasMouseDown)
+canvas.addEventListener("mousedown", canvasMouseDown)
 
-// canvas.addEventListener("mouseup", canvasMouseUp)
+canvas.addEventListener("mouseup", canvasMouseUp)
 
-// canvas.addEventListener("mousemove", canvasMouseDrag)  
-
-
+canvas.addEventListener("mousemove", canvasMouseDrag)  
 
 
 
@@ -81,6 +80,8 @@ function resizeCanvas(){
 
 
 function canvasMouseDown(e){
+    canvasData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
     let scrollX = window.scrollX;
     let scrollY = window.scrollY;
     let x = scrollX + e.clientX;
@@ -94,15 +95,15 @@ function canvasMouseDown(e){
         menuButton.dataset.isOpen = "false";
     }
 
-
     ctx.strokeStyle = currentTool === "eraser" ? backgroundColor : color;
     ctx.fillStyle = currentTool === "eraser" ? backgroundColor : color;
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
     ctx.lineWidth = size;
 
-    if(currentTool ==  "line" || currentTool === "square" || currentTool === "circle" ){
-        canvasData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    if(currentTool ==  "line" || currentTool === "square" || currentTool === "circle" || currentTool === "pen-tool"){
+        if(currentTool === "pen-tool" && firstClick && !(e.ctrlKey)) return;
+        firstClick = !firstClick;
     }else{
         ctx.beginPath();
         ctx.arc(pos.x, pos.y, size/2, 0, Math.PI*2);
@@ -110,23 +111,16 @@ function canvasMouseDown(e){
         ctx.closePath();
     }
    
+    
     ctx.beginPath();
 
     isDrawing = true;
-    // canvas.addEventListener("mousemove", canvasMouseDrag)  
-  
-
-   
-
 }
 
 
 function canvasMouseUp(e){
-
-
-    ctx.closePath()
+    if((currentTool === "line" || currentTool === "square" || currentTool === "circle" || currentTool === "pen-tool") && firstClick) return;
     isDrawing = false;
-    // canvas.removeEventListener("mousemove", canvasMouseDrag);
 }  
 
 function canvasMouseDrag(e){
@@ -138,6 +132,7 @@ function canvasMouseDrag(e){
     let scrollY = window.scrollY;
     let x = scrollX + e.clientX;
     let y = scrollY + e.clientY;
+
 
 
     switch(currentTool){
@@ -182,9 +177,12 @@ function canvasMouseDrag(e){
             ctx.closePath();
             break;
         case "pen-tool":
-
-
-
+            ctx.putImageData(canvasData, 0,0);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+            ctx.lineTo(x, y);
+            ctx.stroke()
+            ctx.closePath()
             break;
     
     }
@@ -204,29 +202,29 @@ function canvasMouseDrag(e){
 
 
 
+let menubtn = document.querySelector("#menu-button")
 
+console.log(document.querySelector("input#menu-button"))
 
 
 //menu
-menuButton.addEventListener("click", (e)=>{
+console.log(menuButton)
+menubtn.addEventListener("click", (e)=>{
     e.stopPropagation();
-    let isMenuOpen = menuButton.dataset.isOpen;
+    let isMenuOpen = !menubtn.checked
 
-    if(isMenuOpen == "true"){
+    if(isMenuOpen){
         mainMenu.style.display = "";
-        menuButton.dataset.isOpen = "false";
     }else{
-        menuButton.dataset.isOpen = "true";
         mainMenu.style.display = "block";
     }
-
 })
 
 
 //icon
 icons.forEach((icon, i)=>{
     if(i === 0) {
-        currentTool =icon.dataset.tool;
+        currentTool = icon.dataset.tool;
         icon.classList.add("selected-icon");
         lastToolIndex = i;
     }
@@ -238,14 +236,30 @@ icons.forEach((icon, i)=>{
         currentTool = this.dataset.tool;
         lastToolIndex = index;
     })
-})
+});
 
 
 colorInput.addEventListener("input", (e)=>{
     let colorValue = color = e.target.value;
-})
+});
 
 
+
+blankPageButton.addEventListener("click", ()=>{
+    // let answer = window.confirm("Do you really want to erase the canvas?");
+    // if(answer) 
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+});
+
+
+
+hardDriveButton.addEventListener("click", (e)=>{
+    let data = canvas.toDataURL("image/jpg");
+    let link = document.createElement("a");
+    link.href = data;
+    link.download = "filename.jpg";
+    link.click();
+});
 
 
 
@@ -263,9 +277,6 @@ sizeNumber.addEventListener("keydown", (e)=>{
     }
 });
 
-// sizeNumber.addEventListener("keyup", (e)=>{
-//     let value = e.target.value;
-// });
 
 sizeNumber.addEventListener("blur", (e)=>{
     let value = e.target.value;
@@ -274,14 +285,12 @@ sizeNumber.addEventListener("blur", (e)=>{
 });
 
 
-
-
-
-
-
-
-
 //Global events
+
+document.addEventListener("keydown", (e)=>{
+
+})
+
 
 document.addEventListener("click", (e)=>{
 
@@ -293,15 +302,6 @@ document.addEventListener("click", (e)=>{
 
 document.addEventListener("mousemove", (e)=>{
     
-    // let x = e.clientX;
-    // let y = e.clientY;
-
-    // if(y < 80){
-    //     menu.style.top = "0px";
-    // }else{
-    //     menu.style.top = "-50px";
-    // }
-
 });
 
 
@@ -372,26 +372,26 @@ canvas.addEventListener("mousedown", (e)=>{
 
 
 
-ctx.beginPath();
-ctx.lineWidth = 20
-ctx.lineCap = "round"
+// ctx.beginPath();
+// ctx.lineWidth = 20
+// ctx.lineCap = "round"
 
 
 
-// ctx.lineTo(200, 200)
-ctx.lineTo(200, 600)
-ctx.bezierCurveTo(200 ,800 ,600, 800, 600, 600);
-ctx.stroke();
+// ctx.moveTo(200, 200)
+// ctx.lineTo(200, 600)
+// ctx.bezierCurveTo(200 ,600 , 200, 800, 600, 600);
+// ctx.stroke();
 
-ctx.closePath();
-ctx.closePath();
+// ctx.closePath();
+// ctx.closePath();
 
-ctx.beginPath();
-ctx.lineWidth = 10;
-ctx.moveTo(200, 600);
-ctx.lineTo(200, 800);
-ctx.stroke();
-ctx.closePath();
+// ctx.beginPath();
+// ctx.lineWidth = 10;
+// ctx.moveTo(200, 600);
+// ctx.lineTo(200, 800);
+// ctx.stroke();
+// ctx.closePath();
 
 // ctx.beginPath();
 // ctx.lineWidth = 10;
@@ -399,7 +399,7 @@ ctx.closePath();
 // ctx.fill();
 // ctx.closePath();
 
-canvasData = ctx.getImageData(0,0, canvas.width, canvas.height);
+// canvasData = ctx.getImageData(0,0, canvas.width, canvas.height);
 
 
 
@@ -430,6 +430,7 @@ canvasData = ctx.getImageData(0,0, canvas.width, canvas.height);
 
 //  clear
 // redo undo
+//tooltips
 
 
 
