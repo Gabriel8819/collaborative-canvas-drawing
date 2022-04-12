@@ -1,8 +1,26 @@
 import {isNumber, isBetween, getRatio} from "./utils/utils.js";
+import {
+    fitCanvasToWindow, 
+    setCanvasBackground,
+    isShapeTools,
+    isToolPresent,
+    drawCircle,
+    drawLine,
+    drawSquare,
+    cursorPosition,
+    hypothenuse
+} from "./Canvas.js";
+
+import Menu from "./Menu.js";
+import CanvasState from "./CanvasState.js";
 
 
+if(navigator.userAgent.toLowerCase().search("mobile") > -1){
+    document.querySelector("#tool-icons").removeChild(document.querySelector(".pen-tool-icon"));
+}
 
-let menuButton = document.querySelector("label[for=menu-button]");
+
+let menuButton = document.querySelector("#menu-button");
 let mainMenu = document.querySelector("div.main-menu");
 let sizeSlider = document.querySelector("#size-slider");
 let sizeNumber = document.querySelector("#size-number");
@@ -13,25 +31,29 @@ let blankPageButton = document.querySelector("#blank-page-button");
 let hardDriveButton = document.querySelector("#hard-drive")
 
 
+
+
+let canvas = document.querySelector("canvas");
+let ctx= canvas.getContext("2d");
+
+
 let tools = {
-    PEN: "pen",
-    ERASER: "eraser",
-    PENTOOL: "pen-tool",
-    LINE: "line",
-    SQUARE: "square",
-    CIRCLE: "circle"
+    PEN: 0,
+    ERASER: 1,
+    LINE: 2,
+    SQUARE: 3,
+    CIRCLE: 4,
+    PENTOOL: 5
 }
 
+
+//State Object
 let currentTool = tools.PEN;
 let color = "#000";
 let backgroundColor = "#fff";
 let lastToolIndex = 0;
 let firstClick = false;
 let size = sizeNumber.value = sizeSlider.value = 10;
-
-let canvas = document.querySelector("canvas");
-let ctx= canvas.getContext("2d");
-
 
 let pos = {
     x: 0,
@@ -41,12 +63,18 @@ let pos = {
 let canvasData;
 let isDrawing = false;
 
-resizeCanvas();
+
+let canvasState = new CanvasState();
+let menu = new Menu(canvasState);
+menu.init(ctx, canvas, menuButton, mainMenu, icons, colorInput, blankPageButton, hardDriveButton, sizeSlider, sizeNumber);
 
 
-ctx.fillStyle = "white"
-ctx.fillRect(0, 0, canvas.width, canvas.height)
 
+
+
+//Init
+fitCanvasToWindow(canvas);
+setCanvasBackground(canvas, ctx);
 
 
 window.addEventListener("wheel", (e)=>{
@@ -56,162 +84,110 @@ window.addEventListener("wheel", (e)=>{
 
 window.addEventListener("resize", (e)=>{
     canvasData = ctx.getImageData(0 , 0, canvas.width, canvas.height);
-    resizeCanvas();
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    fitCanvasToWindow(canvas);
+    setCanvasBackground(canvas, ctx);
     ctx.putImageData(canvasData, 0 , 0);
-})
+});
 
 
 canvas.addEventListener("mousedown", canvasMouseDown)
-
 canvas.addEventListener("mouseup", canvasMouseUp)
-
 canvas.addEventListener("mousemove", canvasMouseDrag)  
 
-
-
-function resizeCanvas(){
-    if(window.innerWidth > canvas.width || window.innerHeight > canvas.height){
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-}
+canvas.addEventListener("touchstart", canvasMouseDown)
+canvas.addEventListener("touchend", canvasMouseUp)
+canvas.addEventListener("touchmove", canvasMouseDrag, {passive: false})
 
 
 function canvasMouseDown(e){
+    let touches = e.touches;
     canvasData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-    let scrollX = window.scrollX;
-    let scrollY = window.scrollY;
-    let x = scrollX + e.clientX;
-    let y = scrollY + e.clientY;
+    let {x, y} = cursorPosition(e);
 
     pos = {x, y};
 
-    let isMenuOpen = menuButton.dataset.isOpen;
-    if(isMenuOpen === "true") {
-        mainMenu.style.display = "";
-        menuButton.dataset.isOpen = "false";
-    }
+    menu.closeMenu(menuButton, mainMenu)
 
-    ctx.strokeStyle = currentTool === "eraser" ? backgroundColor : color;
-    ctx.fillStyle = currentTool === "eraser" ? backgroundColor : color;
+    ctx.strokeStyle = currentTool === tools.ERASER ? backgroundColor : color;
+    ctx.fillStyle = currentTool === tools.ERASER ? backgroundColor : color;
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
     ctx.lineWidth = size;
 
-    if(currentTool ==  "line" || currentTool === "square" || currentTool === "circle" || currentTool === "pen-tool"){
-        if(currentTool === "pen-tool" && firstClick && !(e.ctrlKey)) return;
+    if(isToolPresent(currentTool, [tools.PENTOOL])){
+        if(currentTool === tools.PENTOOL && firstClick && !(e.ctrlKey)) return;
         firstClick = !firstClick;
     }else{
-        ctx.beginPath();
-        ctx.arc(pos.x, pos.y, size/2, 0, Math.PI*2);
-        ctx.fill();
-        ctx.closePath();
+        if(!touches) drawCircle(ctx, pos, size/2, true, false);
     }
-   
-    
     ctx.beginPath();
-
     isDrawing = true;
 }
 
 
 function canvasMouseUp(e){
-    if((currentTool === "line" || currentTool === "square" || currentTool === "circle" || currentTool === "pen-tool") && firstClick) return;
+    if(isShapeTools(currentTool, tools) && firstClick) return;
     isDrawing = false;
 }  
 
 function canvasMouseDrag(e){
+    let touches = e.touches;
+
+    let {x, y} = cursorPosition(e);
     let ctrlKey = e.ctrlKey;
-   
+    
+    if(touches && touches.length === 1){
+        e.preventDefault();
+    }else if (touches && touches.length > 1) {
+        return;
+    }
+
     if(!isDrawing || size == 0) return;
-
-    let scrollX = window.scrollX;
-    let scrollY = window.scrollY;
-    let x = scrollX + e.clientX;
-    let y = scrollY + e.clientY;
-
-
-
+    if(isShapeTools(currentTool, tools)) ctx.putImageData(canvasData, 0,0);
+    
     switch(currentTool){
-        case "pen":
-        case "eraser":
+        case tools.PEN:
+        case tools.ERASER:
             ctx.lineTo(x, y);
             ctx.stroke();
             break;
-        case "line":
-            ctx.putImageData(canvasData, 0,0);
-            ctx.beginPath();
-            ctx.moveTo(pos.x, pos.y);
-            ctx.lineTo(x, y);
-            ctx.stroke()
-            ctx.closePath();
+        case tools.LINE:
+            drawLine(ctx, pos, {x,y})
             break;
-        case "square":
-            ctx.putImageData(canvasData, 0,0);
-            ctx.beginPath();
-            ctx.lineJoin = "miter";
-            ctx.rect(pos.x, pos.y, x - pos.x, y - pos.y);
-            ctx.stroke()
-            ctx.closePath();
+        case tools.SQUARE:
+            drawSquare(ctx, pos, {x,y}, false, true);
             break;
-        case "circle":
-            let hypotenuse = Math.sqrt((x - pos.x) ** 2 + (y - pos.y)**2);
-            let distance = Math.sqrt((x - pos.x) ** 2 + (y - pos.y)**2);
-            let circleX;
-            let circleY;
-            if(ctrlKey){
-                circleX = pos.x 
-                circleY = pos.y
-            }else{
-                circleX = pos.x + (x - pos.x) / 2
-                circleY = pos.y + (y - pos.y) / 2
-                hypotenuse = hypotenuse / 2;
-            }
-            ctx.putImageData(canvasData, 0,0);
-            ctx.beginPath();
-            ctx.arc(circleX, circleY, hypotenuse, 0, Math.PI*2);
-            ctx.stroke();
-            ctx.closePath();
+        case tools.CIRCLE:
+            let hypotenuse = hypothenuse(pos.x, pos.y, x, y);
+            // let circle = {
+            //     x:0,
+            //     y:0
+            // }
+            // if(ctrlKey){
+            //     console.log(ctrlKey)
+            //     circle.x = pos.x; 
+            //     circle.y = pos.y;
+            // }else{
+            //     circle.x = pos.x + (x - pos.x) / 2;
+            //     circle.y = pos.y + (y - pos.y) / 2;
+            //     hypotenuse = hypotenuse / 2;;
+            // }
+            drawCircle(ctx, pos, hypotenuse, false, true);
             break;
-        case "pen-tool":
-            ctx.putImageData(canvasData, 0,0);
-            ctx.beginPath();
-            ctx.moveTo(pos.x, pos.y);
-            ctx.lineTo(x, y);
-            ctx.stroke()
-            ctx.closePath()
+        case tools.PENTOOL:
+            drawLine(ctx, pos, {x,y});
             break;
     
     }
-
-   
-
-    
-
-
-
-
-
-
-
-
 }
 
 
-
-let menubtn = document.querySelector("#menu-button")
-
-console.log(document.querySelector("input#menu-button"))
-
-
+//Menu init ========================================
 //menu
-console.log(menuButton)
-menubtn.addEventListener("click", (e)=>{
+menuButton.addEventListener("click", (e)=>{
     e.stopPropagation();
-    let isMenuOpen = !menubtn.checked
+    let isMenuOpen = !menuButton.checked
 
     if(isMenuOpen){
         mainMenu.style.display = "";
@@ -224,30 +200,28 @@ menubtn.addEventListener("click", (e)=>{
 //icon
 icons.forEach((icon, i)=>{
     if(i === 0) {
-        currentTool = icon.dataset.tool;
+        currentTool = Number(icon.dataset.tool);
         icon.classList.add("selected-icon");
         lastToolIndex = i;
     }
     icon.addEventListener("click", function(e){
         let index = i;
-        icons[lastToolIndex].classList.remove("selected-icon")
+        icons[lastToolIndex].classList.remove("selected-icon");
         icon.classList.add("selected-icon");
 
-        currentTool = this.dataset.tool;
+        currentTool = Number(this.dataset.tool);
         lastToolIndex = index;
     })
 });
 
 
+
 colorInput.addEventListener("input", (e)=>{
-    let colorValue = color = e.target.value;
+    color = e.target.value;
 });
 
 
-
 blankPageButton.addEventListener("click", ()=>{
-    // let answer = window.confirm("Do you really want to erase the canvas?");
-    // if(answer) 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 });
 
@@ -265,8 +239,8 @@ hardDriveButton.addEventListener("click", (e)=>{
 
 //Slider Events
 sizeSlider.addEventListener("input", (e)=>{
-    let value = e.target.valueAsNumber
-    sizeNumber.value = size = value
+    let value = e.target.valueAsNumber;
+    sizeNumber.value = size = value;
 });
 
 sizeNumber.addEventListener("keydown", (e)=>{
@@ -277,7 +251,6 @@ sizeNumber.addEventListener("keydown", (e)=>{
     }
 });
 
-
 sizeNumber.addEventListener("blur", (e)=>{
     let value = e.target.value;
     if(value === "") {e.target.value = sizeSlider.value = size; return;}
@@ -285,88 +258,86 @@ sizeNumber.addEventListener("blur", (e)=>{
 });
 
 
-//Global events
-
-document.addEventListener("keydown", (e)=>{
-
-})
-
-
-document.addEventListener("click", (e)=>{
-
-
-})
-
-
-
-
-document.addEventListener("mousemove", (e)=>{
-    
-});
 
 
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//=============================================================
 
 //test
 
 // ctx.rotate( 45 * (Math.PI / 180))
 
 
-let points = [
-    {type: "line", coord: {x:200, y: 200}},
-    {type: "line", coord: {x:200, y:600}},
-    {type: "bezier", coord: {x:600, y: 600, a1:200, b1:800, a2:600, b2:800}},
-]
+// let points = [
+//     {type: "line", coord: {x:200, y: 200}},
+//     {type: "line", coord: {x:200, y:600}},
+//     {type: "bezier", coord: {x:600, y: 600, a1:200, b1:800, a2:600, b2:800}},
+// ]
 
-let selectedCoord;
+// let selectedCoord;
 
 
-canvas.addEventListener("mousedown", (e)=>{
+// canvas.addEventListener("mousedown", (e)=>{
 
-    let x = e.clientX;
-    let y = e.clientY;
+//     let x = e.clientX;
+//     let y = e.clientY;
 
-    // console.log(x, y )
+//     // console.log(x, y )
 
-    ctx.clearRect(0,0,canvas.width, canvas.height)
-    ctx.putImageData(canvasData, 0, 0);
+//     ctx.clearRect(0,0,canvas.width, canvas.height)
+//     ctx.putImageData(canvasData, 0, 0);
     
 
-    points.forEach((point, index)=>{
-        if(Math.abs(x - point.coord.x) < 10 && Math.abs(y - point.coord.y) < 10){
-            console.log(index)
-            let prev = index-1;
-            let next = index+1;
+//     points.forEach((point, index)=>{
+//         if(Math.abs(x - point.coord.x) < 10 && Math.abs(y - point.coord.y) < 10){
+//             console.log(index)
+//             let prev = index-1;
+//             let next = index+1;
 
-            console.log(points[next], next)
+//             console.log(points[next], next)
             
-            if(points[prev]!= null) {
+//             if(points[prev]!= null) {
                 
-            }
-            if(points[next]!= null) {
+//             }
+//             if(points[next]!= null) {
 
-            }
+//             }
 
 
-            let pt = point.coord;
+//             let pt = point.coord;
             
-            ctx.beginPath()
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = "red";
-            ctx.arc(pt.x, pt.y, 10, 0, Math.PI * 2)
-            ctx.stroke();
-            ctx.closePath();
-        }
+//             ctx.beginPath()
+//             ctx.lineWidth = 2;
+//             ctx.strokeStyle = "red";
+//             ctx.arc(pt.x, pt.y, 10, 0, Math.PI * 2)
+//             ctx.stroke();
+//             ctx.closePath();
+//         }
 
-    });
-
-
-    // 
-
-})
+//     });
+// });
 
 
 
@@ -426,13 +397,13 @@ canvas.addEventListener("mousedown", (e)=>{
 
 
 
-
-
-//  clear
+//remove file git
 // redo undo
 //tooltips
-
-
+//refactor
+// mobile 
+//test suite
+//cross browser
 
 
 

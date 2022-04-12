@@ -9,8 +9,13 @@
 
 }
 
+body{
+    overscroll-behavior: contain;
+}
+
 canvas{
     position: absolute;
+    box-sizing: border-box;
 }
 
 canvas:hover{
