@@ -1,6 +1,6 @@
 import Tools from "./Tools.js";
-import { isShapeTools, isToolPresent, cursorPosition } from "../utils/utils.js";
-import {radius} from "../utils/math.js";
+import { isShapeTools, isToolPresent, cursorPosition } from "../src/utils/utils.js";
+import {radius} from "../src/utils/math.js";
 import CommandHistory from "./CommandHistory.js";
 import Command from "./Command.js";
 
