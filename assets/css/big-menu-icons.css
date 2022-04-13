@@ -1,0 +1,57 @@
+/* Big Icons */
+#storage-menu{
+    margin-top: 10px;
+    justify-content: space-around;
+}
+
+#storage-choice{
+    margin-top: 10px ;
+    display: flex;
+    justify-content: space-around;
+}
+
+
+
+.big-icon{
+    cursor: pointer;
+    border: 1px solid black;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.big-icon > button{
+    cursor: pointer;
+    width: 100px;
+    height: 100px;
+    display: block;
+    background-color: transparent;
+    background-position: center;
+    background-size: contain;
+}
+.big-icon > span{
+    display: block;
+    margin: 10px 0 0 0;
+
+}
+
+
+#google-drive > button{
+    background-image: url("/assets/images/google-drive.png");
+    margin: 0 auto;
+    
+}
+
+#google-drive:hover{
+    background-color: rgb(160, 160, 160);
+}
+
+#hard-drive > button{
+    background-image: url("/assets/images/hard-drive.png");
+    background-position: center;
+    background-size: contain;
+    background-color: transparent;
+}
+
+#hard-drive:hover{
+    background-color: rgb(160, 160, 160);
+}

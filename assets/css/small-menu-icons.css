@@ -1,0 +1,139 @@
+/*Other icons */
+div#menu-icons{
+    margin: 10px 0;
+}
+div#menu-icons > h4{
+    margin: 10px 0;
+}
+
+div#tool-icons{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+
+.icon{
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+}
+
+.icon:hover{
+    cursor: pointer;
+    background-color: rgb(119, 119, 119);
+    border-radius: 5px;
+}
+
+.pen-icon,
+.pen-tool-icon,
+.eraser-icon{
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 27px;
+}
+
+.eraser-icon{
+    background-image: url("/assets/images/eraser.png");
+}
+
+.square-icon,
+.circle-icon,
+.line-icon{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.square-icon::after,
+.circle-icon::after{
+    content: "";
+    display: block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgb(0, 0, 0);
+}
+
+.circle-icon::after{
+    border-radius: 50%;
+}
+
+.line-icon::after{
+    content: "";
+    display: block;
+    width: 30px;
+    height: 30px;
+    border-top: 2px solid rgb(0, 0, 0);
+    transform-origin: 0 0;
+    transform: rotate(45deg) translateX(8px);
+}
+
+.pen-tool-icon{
+    background-image: url("/assets/images/pen-tool.png");
+}
+
+.pen-icon{
+    background-image: url("/assets/images/pen.png");
+}
+
+
+.selected-icon{
+    background-color: rgb(119, 119, 119);
+}
+
+div.advanced-icons{
+    display: flex;
+    justify-content: space-around;
+}
+
+div.advanced-icons > div {
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+div.color-icon > label{
+}
+
+input[type=color]{
+    cursor: pointer;
+    height: 40px;
+}
+
+
+#color-picker{
+    
+}
+
+#blank-page > button{
+    line-height: 30px;
+    padding: 5px 0 5px 10px;
+    border-radius: 5px;
+    background-color: rgb(105, 105, 105);;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+}
+
+#blank-page > button:hover{
+    background-color: rgb(70, 70, 70);
+}
+
+span#blank-page-icon{
+    float: right;
+    display: block;
+    width: 30px;
+    height: 30px;
+    padding-right: 10px;
+
+    background-image: url("/assets/images/blank-page.png");
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    
+
+}
+

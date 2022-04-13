@@ -1,25 +1,24 @@
 import {isNumber, isBetween} from "../utils/utils.js";
 
 export default class Menu{
-
-
     constructor(canvasState){
         this.canvasState = canvasState;
     }
 
-    init(ctx, canvas, menuButton, mainMenu, icons, colorInput, blankPageButton, hardDriveButton,sizeSlider, sizeNumber){
+    init(ctx, canvas, menuButton, mainMenu, icons, colorInput, blankPageButton, hardDriveButton, sizeSlider, sizeNumber){
         this.showMenuEvent(menuButton, mainMenu);
         this.setIconEvents(icons);
-        this.setColor(colorInput)
-        this.eraseCanvas(blankPageButton, ctx, canvas)
-        this.saveCanvasToDisk(hardDriveButton, canvas)
+        this.setColor(colorInput);
+        this.eraseCanvas(blankPageButton, ctx, canvas);
+        this.saveCanvasToDisk(hardDriveButton, canvas);
         this.setToolSizeEvents(sizeSlider, sizeNumber);
+        sizeSlider.value = sizeNumber.value = this.canvasState.size;
     }
 
     showMenuEvent(menuButton, mainMenu){
         menuButton.addEventListener("click", (e)=>{
             e.stopPropagation();
-            let isMenuOpen = !menuButton.checked
+            let isMenuOpen = !menuButton.checked;
         
             if(isMenuOpen){
                 mainMenu.style.display = "";
@@ -72,6 +71,7 @@ export default class Menu{
 
     setToolSizeEvents(sizeSlider, sizeNumber){
         sizeSlider.addEventListener("input", (e)=>{
+            
             let value = e.target.valueAsNumber;
             this.canvasState.size = sizeNumber.value = value;
         });
@@ -84,9 +84,15 @@ export default class Menu{
             }
         });
 
-        sizeNumber.addEventListener("blur", (e)=>{
+        sizeNumber.addEventListener("input", (e)=>{
             let value = e.target.value;
-            if(value === "") {e.target.value = sizeSlider.value = this.canvasState.size; return;}
+            // if(value === "") {e.target.value = sizeSlider.value = this.canvasState.size; return;}
+            this.canvasState.size = e.target.value = sizeSlider.value = isBetween(value, 0, 400);
+        })
+        sizeNumber.addEventListener("blur", (e)=>{
+            console.log("blur")
+            let value = e.target.value;
+            if(value === "") {e.target.value = sizeSlider.value = 0; return;}
             this.canvasState.size = e.target.value = sizeSlider.value = isBetween(value, 0, 400);
         });
     }
